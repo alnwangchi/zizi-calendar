@@ -46,11 +46,19 @@ const columns = [
     title: '桌曆數量',
     dataIndex: ['calendar', 'quantity'],
     key: 'calendarQuantity',
+    render: (value, whole) => {
+      const sign = whole?.calendar?.signed ? ' (需簽)' : '';
+      return `${value} ${sign}`;
+    },
   },
   {
     title: '簽名照數量',
     dataIndex: ['polaroid', 'quantity'],
     key: 'polaroidQuantity',
+    render: (value, whole) => {
+      const sign = whole?.calendar?.signed ? ' (需簽)' : '';
+      return `${value} ${sign}`;
+    },
   },
   {
     title: '建立時間',
