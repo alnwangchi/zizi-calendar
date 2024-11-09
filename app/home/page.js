@@ -7,53 +7,53 @@ import { db } from '/firebase';
 
 const columns = [
   {
-    title: 'Name',
+    title: '姓名',
     dataIndex: 'name',
     key: 'name',
   },
   {
-    title: 'Phone',
+    title: '電話',
     dataIndex: 'phone',
     key: 'phone',
   },
   {
-    title: 'Store ID',
+    title: '門市',
     dataIndex: 'storeId',
     key: 'storeId',
   },
   {
-    title: 'Delivery Method',
+    title: '配送方式',
     dataIndex: 'deliveryMethod',
     key: 'deliveryMethod',
   },
   {
-    title: 'Bank Code',
+    title: '銀行末五碼',
     dataIndex: 'bankCode',
     key: 'bankCode',
   },
   {
-    title: 'Total',
+    title: '總價',
     dataIndex: 'total',
     key: 'total',
   },
   {
-    title: 'Paid',
+    title: '是否付款',
     dataIndex: 'havePaid',
     key: 'havePaid',
     render: (text) => (text ? 'Yes' : 'No'),
   },
   {
-    title: 'Calendar Quantity',
+    title: '桌曆數量',
     dataIndex: ['calendar', 'quantity'],
     key: 'calendarQuantity',
   },
   {
-    title: 'Polaroid Quantity',
+    title: '簽名照數量',
     dataIndex: ['polaroid', 'quantity'],
     key: 'polaroidQuantity',
   },
   {
-    title: 'Created At',
+    title: '建立時間',
     dataIndex: 'createdAt',
     key: 'createdAt',
     render: (createdAt) => {
