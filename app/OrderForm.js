@@ -1,21 +1,10 @@
 'use client';
 import React, { useState } from 'react';
-import {
-  Form,
-  Input,
-  InputNumber,
-  Radio,
-  Select,
-  Space,
-  Typography,
-  Button,
-  Card,
-  message,
-} from 'antd';
+import { Form, Input, InputNumber, Radio, Space, Typography, Button, Card, message } from 'antd';
 import { db } from '/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const OrderForm = () => {
   const [form] = Form.useForm();
@@ -39,7 +28,6 @@ const OrderForm = () => {
 
   const onFinish = async (values) => {
     try {
-      console.log('Form values:', values);
       const orderData = {
         ...values,
         total,
@@ -48,11 +36,12 @@ const OrderForm = () => {
       };
       await addDoc(collection(db, 'orders'), orderData);
 
-      message.success('訂單提交成功！');
+      message.success('感謝您的訂購！', 4);
       form.resetFields();
       setTotal(0);
     } catch (error) {
       message.success('訂單提交失敗 請稍後再度嘗試！');
+    } finally {
     }
   };
 
@@ -69,38 +58,46 @@ const OrderForm = () => {
           polaroid: { quantity: 0, signed: false },
         }}
       >
-        <Title level={3}>訂購表單</Title>
+        <Title level={3}>2025 姿姿老師桌曆訂購 訂購表單</Title>
+        <Space direction='vertical' className='mb-2'>
+          <Text strong>本次活動將有 10% 作為公益款項</Text>
+          <Text>桌曆 $800/本 </Text>
+          <Text> 加購拍立得(隨機) $100/張</Text>
+          <Text type='danger'>玉山銀行 808-1171979176757</Text>
+          <Text>只接受轉帳 (轉帳後告知查帳) </Text>
+          <Text>滿兩千免運 可訂購時間 即日 ~ 11 月底 預計 12 月開始出貨</Text>
+        </Space>
 
-        {/* 基本資料 */}
-        <Form.Item
-          className='mb-3'
-          name='name'
-          label='姓名'
-          rules={[{ required: true, message: '請輸入姓名' }]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          className='mb-3'
-          name='phone'
-          label='電話'
-          rules={[
-            { required: true, message: '請輸入電話' },
-            { pattern: /^09\d{8}$/, message: '請輸入正確的手機號碼格式' },
-            { max: 10, message: '請輸入 10 碼' },
-          ]}
-        >
-          <Input />
-        </Form.Item>
         <div className='flex gap-4'>
-          <Form.Item label='桌曆' className='w-1/2'>
+          <Form.Item
+            className='mb-2 font-bold'
+            name='name'
+            label='姓名'
+            rules={[{ required: true, message: '請輸入姓名' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            className='mb-2 font-bold'
+            name='phone'
+            label='電話'
+            rules={[
+              { required: true, message: '請輸入電話' },
+              { pattern: /^09\d{8}$/, message: '請輸入正確的手機號碼格式' },
+              { max: 10, message: '請輸入 10 碼' },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </div>
+        <div className='flex gap-4'>
+          <Form.Item label='桌曆' className='w-1/2 font-bold'>
             <Space direction='vertical'>
-              <Form.Item name={['calendar', 'quantity']} className='mb-0'>
+              <Form.Item name={['calendar', 'quantity']} className='flex w-full mb-0'>
                 <InputNumber min={0} placeholder='數量' />
               </Form.Item>
               <Form.Item name={['calendar', 'signed']} className='mb-0'>
-                <Radio.Group>
+                <Radio.Group className='font-normal'>
                   <Radio value={true}>需要簽名</Radio>
                   <Radio value={false}>不需簽名</Radio>
                 </Radio.Group>
@@ -108,13 +105,13 @@ const OrderForm = () => {
             </Space>
           </Form.Item>
 
-          <Form.Item label='拍立得' className='w-1/2'>
+          <Form.Item label='拍立得' className='w-1/2 font-bold'>
             <Space direction='vertical'>
               <Form.Item name={['polaroid', 'quantity']} className='mb-0'>
                 <InputNumber min={0} placeholder='數量' />
               </Form.Item>
               <Form.Item name={['polaroid', 'signed']} className='mb-0'>
-                <Radio.Group>
+                <Radio.Group className='font-normal'>
                   <Radio value={true}>需要簽名</Radio>
                   <Radio value={false}>不需簽名</Radio>
                 </Radio.Group>
@@ -124,12 +121,12 @@ const OrderForm = () => {
         </div>
 
         <Form.Item
-          className='mb-3'
+          className='mb-3 font-bold'
           name='deliveryMethod'
           label='配送方式'
           rules={[{ required: true, message: '請選擇配送方式' }]}
         >
-          <Radio.Group>
+          <Radio.Group className='font-normal'>
             <Radio value='711'>7-11 店到店 (運費 60)</Radio>
             <Radio value='post'>郵局配送 (運費 60)</Radio>
           </Radio.Group>
@@ -137,7 +134,7 @@ const OrderForm = () => {
         <div className={`flex gap-4 ${deliveryMethod === '711' ? '' : 'flex-wrap'}`}>
           {deliveryMethod === '711' && (
             <Form.Item
-              className='w-1/2'
+              className='w-1/2 font-bold'
               name='storeId'
               label='選擇門市'
               rules={[{ required: true, message: '請選擇門市' }]}
@@ -148,7 +145,7 @@ const OrderForm = () => {
 
           {deliveryMethod === 'post' && (
             <Form.Item
-              className='w-full'
+              className='w-full font-bold'
               name='address'
               label='收件地址'
               rules={[{ required: true, message: '請輸入收件地址' }]}
@@ -158,7 +155,7 @@ const OrderForm = () => {
           )}
 
           <Form.Item
-            className='w-1/2'
+            className='w-1/2 font-bold'
             name='bankCode'
             label='匯款帳戶末五碼'
             rules={[
