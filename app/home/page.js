@@ -73,7 +73,6 @@ const columns = [
 
 const Page = () => {
   const [data, setData] = useState([]);
-  console.log('🚀 ~ data:', data);
 
   useEffect(() => {
     const fetchData = async () => {
