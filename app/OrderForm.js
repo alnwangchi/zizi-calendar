@@ -34,7 +34,7 @@ const OrderForm = () => {
         createdAt: serverTimestamp(),
         havePaid: false,
       };
-      await addDoc(collection(db, 'orders'), orderData);
+      await addDoc(collection(db, 'zizi-202411-calendar'), orderData);
 
       message.success('感謝您的訂購！', 4);
       form.resetFields();

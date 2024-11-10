@@ -77,7 +77,7 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'orders'));
+        const querySnapshot = await getDocs(collection(db, 'zizi-202411-calendar'));
         const dataList = querySnapshot.docs.map((doc) => doc.data());
         setData(dataList);
       } catch (error) {
