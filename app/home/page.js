@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, Col, Row, Statistic, Table } from 'antd';
-import { collection, getDocs } from 'firebase/firestore';
+import { Card, Col, Row, Statistic, Table, message } from 'antd';
+import { collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
 import { ceil, sumBy } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { db } from '/firebase';
@@ -18,14 +18,25 @@ const columns = [
     key: 'phone',
   },
   {
-    title: '門市',
-    dataIndex: 'storeId',
-    key: 'storeId',
-  },
-  {
     title: '配送方式',
     dataIndex: 'deliveryMethod',
     key: 'deliveryMethod',
+  },
+  {
+    title: '門市',
+    dataIndex: 'storeId',
+    key: 'storeId',
+    render: (storeId) => {
+      return storeId ? `門市${storeId}` : '-';
+    },
+  },
+  {
+    title: '地址',
+    dataIndex: 'address',
+    key: 'address',
+    render: (address) => {
+      return address ? address : '-';
+    },
   },
   {
     title: '銀行末五碼',
@@ -41,7 +52,32 @@ const columns = [
     title: '是否付款',
     dataIndex: 'havePaid',
     key: 'havePaid',
-    render: (text) => (text ? 'Yes' : 'No'),
+    render: (paid, record) => {
+      return (
+        <button
+          onDoubleClick={async (e) => {
+            e.stopPropagation();
+            try {
+              const docRef = doc(db, 'zizi-202411-calendar', record.id);
+              await updateDoc(docRef, {
+                havePaid: !paid,
+              });
+              message.success('付款狀態已更新');
+              // 重新讀取
+              record.refetch();
+            } catch (error) {
+              console.error('Error updating payment status:', error);
+              message.error('更新失敗');
+            }
+          }}
+          className={`px-4 py-1 rounded ${
+            paid ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
+          }`}
+        >
+          {paid ? '已付款' : '未付款'}
+        </button>
+      );
+    },
   },
   {
     title: '桌曆數量',
@@ -79,8 +115,14 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'zizi-202411-calendar'));
-        const dataList = querySnapshot.docs.map((doc) => doc.data());
+        const q = query(collection(db, 'zizi-202411-calendar'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const dataList = querySnapshot.docs.map((doc) => ({
+          id: doc.id, // 從 doc 取得 id
+          ...doc.data(), // 展開其他資料
+          refetch: fetchData, // 加入重新讀取函數
+        }));
+
         setData(dataList);
       } catch (error) {
         console.error('Error fetching data: ', error);
