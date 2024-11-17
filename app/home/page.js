@@ -1,10 +1,12 @@
 'use client';
 
-import { Card, Col, Row, Statistic, Table, message } from 'antd';
+import { Card, Col, Row, Statistic, Table, message, Tag } from 'antd';
 import { collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
 import { ceil, sumBy } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { db } from '/firebase';
+import dayjs from 'dayjs';
+import { Stamp } from 'lucide-react';
 
 const columns = [
   {
@@ -21,13 +23,24 @@ const columns = [
     title: '配送方式',
     dataIndex: 'deliveryMethod',
     key: 'deliveryMethod',
+    render: (method) => {
+      return method === '711' ? (
+        <Tag color='orange' className='font-bold'>
+          711
+        </Tag>
+      ) : (
+        <Tag color='green' className='font-bold'>
+          郵寄
+        </Tag>
+      );
+    },
   },
   {
     title: '門市',
     dataIndex: 'storeId',
     key: 'storeId',
     render: (storeId) => {
-      return storeId ? `門市${storeId}` : '-';
+      return storeId?.replace('門市', '') || '-';
     },
   },
   {
@@ -35,18 +48,57 @@ const columns = [
     dataIndex: 'address',
     key: 'address',
     render: (address) => {
-      return address ? address : '-';
+      return address || '-';
     },
   },
   {
-    title: '銀行末五碼',
+    title: '銀行五碼',
     dataIndex: 'bankCode',
     key: 'bankCode',
+  },
+
+  {
+    title: '桌曆',
+    dataIndex: ['calendar', 'quantity'],
+    key: 'calendarQuantity',
+    render: (value, whole) => {
+      const sign = whole?.calendar?.signed;
+      return (
+        <div className='flex gap-2 items-center'>
+          {value} {sign && <Stamp size={16} strokeWidth={1.5} />}
+        </div>
+      );
+    },
+  },
+  {
+    title: '簽名照',
+    dataIndex: ['polaroid', 'quantity'],
+    key: 'polaroidQuantity',
+    render: (value, whole) => {
+      const sign = whole?.polaroid?.signed;
+      return (
+        <div className='flex gap-2 items-center'>
+          {value} {sign && <Stamp size={16} strokeWidth={1.5} />}
+        </div>
+      );
+    },
+  },
+  {
+    title: '下訂時間',
+    dataIndex: 'createdAt',
+    key: 'createdAt',
+    render: (createdAt) => {
+      const displayTime = dayjs(createdAt.seconds * 1000).format('YYYY-MM-DD');
+      return displayTime;
+    },
   },
   {
     title: '總價',
     dataIndex: 'total',
     key: 'total',
+    render: (total) => {
+      return <h3 className='font-bold'>{total}</h3>;
+    },
   },
   {
     title: '是否付款',
@@ -80,30 +132,34 @@ const columns = [
     },
   },
   {
-    title: '桌曆數量',
-    dataIndex: ['calendar', 'quantity'],
-    key: 'calendarQuantity',
-    render: (value, whole) => {
-      const sign = whole?.calendar?.signed ? ' (需簽)' : '';
-      return `${value} ${sign}`;
-    },
-  },
-  {
-    title: '簽名照數量',
-    dataIndex: ['polaroid', 'quantity'],
-    key: 'polaroidQuantity',
-    render: (value, whole) => {
-      const sign = whole?.calendar?.signed ? ' (需簽)' : '';
-      return `${value} ${sign}`;
-    },
-  },
-  {
-    title: '建立時間',
-    dataIndex: 'createdAt',
-    key: 'createdAt',
-    render: (createdAt) => {
-      const date = new Date(createdAt.seconds * 1000);
-      return date.toLocaleString();
+    title: '是否出貨',
+    dataIndex: 'haveSend',
+    key: 'haveSend',
+    render: (send, record) => {
+      return (
+        <button
+          onDoubleClick={async (e) => {
+            e.stopPropagation();
+            try {
+              const docRef = doc(db, 'zizi-202411-calendar', record.id);
+              await updateDoc(docRef, {
+                haveSend: !send,
+              });
+              message.success('出貨狀態已更新');
+              // 重新讀取
+              record.refetch();
+            } catch (error) {
+              console.error('Error updating payment status:', error);
+              message.error('更新失敗');
+            }
+          }}
+          className={`px-4 py-1 rounded ${
+            send ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
+          }`}
+        >
+          {send ? '已出貨' : '未出貨'}
+        </button>
+      );
     },
   },
 ];
