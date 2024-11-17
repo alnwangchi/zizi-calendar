@@ -122,7 +122,7 @@ const columns = [
               message.error('更新失敗');
             }
           }}
-          className={`px-4 py-1 rounded ${
+          className={`px-4 py-1 rounded whitespace-nowrap ${
             paid ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
           }`}
         >
@@ -153,7 +153,7 @@ const columns = [
               message.error('更新失敗');
             }
           }}
-          className={`px-4 py-1 rounded ${
+          className={`px-4 py-1 rounded whitespace-nowrap ${
             send ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
           }`}
         >
